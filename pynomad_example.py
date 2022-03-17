@@ -2,19 +2,32 @@ import PyNomad
 import sys
 
 
-def bb(x):
+def bb(x1, x2, x3):
     """
-    TODO
-    :param x:
-    :return:
+    "Black-box" function to minimize f(x1,x2,x3)=x1^2 + x2^2 + x3^2
+    :param x1: continuous variable x1 \in [-1, 1]
+    :param x2: continuous variable x2 \in [-1, 1]
+    :param x3: integer variable x3 \in {1, 10}
+    :return: f(x1,x2,x3)=x1^2 + x2^2 + x3^^
+    """
+    return x1 ** 2 + x2 ** 2 + x3 ** 2
+
+
+def bb_pynomad(x):
+    """
+    "Black-box" function formatted to software PyNomad
+    :param x: a vector of 3 component, x=(x1,x2,x3) where x1,x2 are continuous and x3 is an integer.
+    :param bb: function to optimize
+     NOTE :  x.get_coord(i) retrives the i-th component of the vector x
+    :return: for an evaluation, 0 if PyNomad failed, 1 if PyNomad succeed
     """
     try:
-        f = x.get_coord(0)**2 + x.get_coord(1)**2 + x.get_coord(2)**2
+        f = bb(x.get_coord(0), x.get_coord(1), x.get_coord(2))
         x.setBBO(str(f).encode("UTF-8"))
     except:
         print("Unexpected eval error", sys.exc_info()[0])
         return 0
-    return 1 # 1: success 0: failed evaluation
+    return 1  # 1: success 0: failed evaluation
 
 
 # Initial point x0, lower bound (lb) and upper bound(ub)
@@ -31,5 +44,4 @@ params = [max_nb_of_evaluations, dimension, input_type,
           "DISPLAY_DEGREE 2", "BB_OUTPUT_TYPE OBJ", "DISPLAY_ALL_EVAL FALSE", "DISPLAY_STATS BBE OBJ (SOL)"]
 
 # Important : PyNomad strictly minimizes the bb function
-PyNomad.optimize(bb, x0, lb, ub, params)
-
+PyNomad.optimize(bb_pynomad, x0, lb, ub, params)
