@@ -106,22 +106,33 @@ def accuracy(model, loader, device):
 
 
 # Train on all epochs and select the best trained model based on accuracy on the validation set
-def FCC_main(model, train_loader, validation_loader,  epochs, lr, b1, b2, device):
+def FCC_main(model, train_loader, validation_loader,  epochs, device, hp):
     """
-    TODO
+    Main
     :param model:
     :param train_loader:
     :param validation_loader:
     :param epochs:
-    :param lr:
-    :param b1:
-    :param b2:
     :param device:
+    :param hp:
     :return:
     """
-    best_precision = 0
-    optimizer = optim.Adam(model.parameters(), betas=(b1, b2), lr=lr, weight_decay=0.05)
+    # Unwrap hyperparameters contained in list hp = (o, a, u1, u2, r, b1, b2,)
+    o = hp[0]
+    lr = hp[1]
+    b1 = hp[2]
+    b2 = hp[3]
+
+    if o == "Adam":
+        optimizer = optim.Adam(model.parameters(), betas=(b1, b2), lr=lr, weight_decay=0.05)
+    elif o == "ASGD":
+        optimizer = optim.ASGD(model.parameters(), lr=lr, lambd=b2, alpha=b1)
+    else:
+        raise Exception("Optimizer must be a string between Adam or ASGD")
+
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min')
+
+    best_precision = 0
     training_losses = []
     accuracies = []
     validation_losses = []
